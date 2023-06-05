@@ -1,32 +1,43 @@
-use bevy::prelude::*;
-
-use bevy::app::AppExit;
-
 mod game;
 mod state;
 
+use bevy::prelude::*;
+// use bevy::window::close_on_esc;
+
+use bevy::app::AppExit;
+use bevy::app::CoreSchedule::Startup;
+use bevy::window::PrimaryWindow;
+
 use game::*;
-use state::*;
+
+#[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
+pub enum AppState {
+    #[default]
+    MainMenu,
+    Game,
+    GameOver,
+}
 
 fn main() {
     App::new()
-        // Bevy Plugins
+        .add_plugin(GamePlugin)
         .add_plugins(DefaultPlugins)
         .add_state::<AppState>()
-        // My Plugins
-        // .add_plugin(MainMenuPlugin)
-        .add_plugin(GamePlugin)
-        // Startup Systems
-        // .add_startup_system(spawn_camera)
-        // Systems
-        // .add_system(transition_to_game_state)
-        // .add_system(transition_to_main_menu_state)
-        .add_system(exit_game)
-        // .add_system(handle_game_over)
+        .add_system(q_to_quit)
+        .add_system(spawn_camera.in_schedule(Startup))
+        .insert_resource(ClearColor(Color::rgb(0.5, 0.5, 0.5)))
         .run();
 }
 
-pub fn exit_game(
+pub fn spawn_camera(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
+    let window = window_query.get_single().unwrap();
+
+    commands.spawn(Camera2dBundle {
+        transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
+        ..default()
+    });
+}
+pub fn q_to_quit(
     keyboard_input: Res<Input<KeyCode>>,
     mut app_exit_event_writer: EventWriter<AppExit>,
 ) {
