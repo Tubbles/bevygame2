@@ -2,12 +2,17 @@ mod constant;
 mod game;
 // mod state;
 
-use bevy::log::{Level, LogPlugin};
-use bevy::prelude::*;
-use bevy::render::settings::Backends;
-use bevy::render::settings::WgpuSettings;
-use bevy::render::RenderPlugin;
-use bevy::window::close_on_esc;
+use bevy::{
+    diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
+    log::{Level, LogPlugin},
+    prelude::*,
+    render::settings::Backends,
+    render::settings::WgpuSettings,
+    render::RenderPlugin,
+    window::close_on_esc,
+    window::PresentMode,
+};
+
 use constant::Constant;
 use game::*;
 
@@ -40,16 +45,10 @@ fn main() {
             DefaultPlugins
                 .set(LogPlugin {
                     level: Level::INFO,
-                    // filter: "wgpu=error,bevy_render=info,bevy_ecs=trace".to_string(),
                     filter: concat!(
-                        "bevy_diagnostic=warn,",
-                        "bevy_render=warn,",
-                        "bevy_window=warn,",
-                        "bevy_winit=warn,",
-                        "bevy_winit=warn,",
-                        "wgpu_core=warn,",
-                        "wgpu_hal=warn,",
-                        "winit=warn,",
+                        "wgpu=warn,",
+                        // "bevygame2=info,",
+                        // "bevy=info,",
                     )
                     .to_string(),
                 })
@@ -58,8 +57,24 @@ fn main() {
                         backends: Some(Backends::VULKAN),
                         ..default()
                     },
+                })
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        title: "I am a window!".into(),
+                        // resolution: (640., 480.).into(),
+                        present_mode: PresentMode::AutoVsync,
+                        // // Tells wasm to resize the window according to the available canvas
+                        // fit_canvas_to_parent: true,
+                        // // Tells wasm not to override default event handling, like F5, Ctrl+R etc.
+                        // prevent_default_event_handling: false,
+                        // window_theme: Some(WindowTheme::Dark),
+                        ..default()
+                    }),
+                    ..default()
                 }),
         )
+        .add_plugin(FrameTimeDiagnosticsPlugin)
+        .add_plugin(LogDiagnosticsPlugin::default())
         .add_state::<AppState>()
         // .add_system(q_to_quit)
         .add_system(close_on_esc)

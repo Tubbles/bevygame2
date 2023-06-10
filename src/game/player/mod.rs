@@ -33,4 +33,9 @@ impl Plugin for PlayerPlugin {
 
 fn hello_world(constant: Res<Constant>) {
     println!("Hello, world! {}", constant.aasd);
+    trace!("very noisy");
+    debug!("helpful for debugging");
+    info!("helpful information that is worth printing by default");
+    warn!("something bad happened that isn't a failure, but thats worth calling out");
+    error!("something failed");
 }
