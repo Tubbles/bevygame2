@@ -1,3 +1,4 @@
+use crate::constant::Constant;
 use bevy::prelude::*;
 
 pub struct PlayerPlugin;
@@ -30,6 +31,6 @@ impl Plugin for PlayerPlugin {
     }
 }
 
-fn hello_world() {
-    println!("Hello, world!");
+fn hello_world(constant: Res<Constant>) {
+    println!("Hello, world! {}", constant.aasd);
 }
